@@ -1345,7 +1345,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   moveSpeed: 5
-  rotationSpeed: 25
+  rotationSpeed: 90
   IsBullet: 0
 --- !u!1001 &2054224625
 PrefabInstance:

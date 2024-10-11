@@ -1,25 +1,25 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using static UnityEditor.Progress;
-using Unity.VisualScripting;
 using UnityEngine.UI;
 using TMPro;
 using System;
 
-public class Items: MonoBehaviour
+public class Items : MonoBehaviour
 {
     [SerializeField] private Image itemImageHolder;
     private List<Color> items = new List<Color>();
     private int activeItemIndex = -1;
     [SerializeField] private TMP_Text messageField;
+    private float cooldownCounter = 0f;
     public static event Action<int> OnRotatePickup;
     public static event Action<int> OnSpeedPickup;
     public static event Action<float> OncooldownPickup;
+
     // Start is called before the first frame update
     void Start()
     {
-
+        StartCoroutine(ShowMessage("Welcome to Space 4 8. \n Move your ship with the arrows or WASD. \n Shoot with SPACE. \n Gather pickups and cycle with 'Left CTRL'.  \n Use pickups with 'E'.", 5f));
     }
 
     // Update is called once per frame
@@ -28,13 +28,15 @@ public class Items: MonoBehaviour
         CycleItems();
         UseItems();
     }
-    IEnumerator ShowMessage(string message)
+
+    IEnumerator ShowMessage(string message, float duration)
     {
         messageField.enabled = true;
         messageField.text = message;
-        yield return new WaitForSeconds(3f);
+        yield return new WaitForSeconds(duration);
         messageField.enabled = false;
     }
+
     private void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.CompareTag("Item"))
@@ -42,9 +44,9 @@ public class Items: MonoBehaviour
             PickUpItem(other.gameObject);
         }
     }
+
     public void PickUpItem(GameObject item)
     {
-
         Color color = item.gameObject.GetComponent<Renderer>().material.color;
 
         Destroy(item);
@@ -55,6 +57,7 @@ public class Items: MonoBehaviour
         itemImageHolder.color = items[activeItemIndex];
         itemImageHolder.enabled = true;
     }
+
     public void CycleItems()
     {
         if (Input.GetKeyDown(KeyCode.LeftControl))
@@ -79,27 +82,27 @@ public class Items: MonoBehaviour
             }
         }
     }
+
     public void UseItems()
     {
-
         if (Input.GetKeyDown(KeyCode.E) && items.Count > 0 && activeItemIndex != -1)
         {
-
             if (items[activeItemIndex] == Color.blue)
             {
-                StartCoroutine(ShowMessage(" +  Move Speed"));
-                OnSpeedPickup.Invoke(5);// += 5;
+                StartCoroutine(ShowMessage(" + Move Speed", 3f));
+                OnSpeedPickup.Invoke(5); // += 5;
             }
             else if (items[activeItemIndex] == Color.red)
             {
-                StartCoroutine(ShowMessage(" + Fire Rate"));
-                OncooldownPickup.Invoke(0.1f); //-= 0.1f;
+                StartCoroutine(ShowMessage(" + Fire Rate", 3f));
+                OncooldownPickup.Invoke(0.1f); // -= 0.1f;
             }
             else if (items[activeItemIndex] == Color.green)
             {
-                StartCoroutine(ShowMessage(" + Rotation Speed"));
-                OnRotatePickup.Invoke(10); //+= 10;
+                StartCoroutine(ShowMessage(" + Rotation Speed", 3f));
+                OnRotatePickup.Invoke(10); // += 10;
             }
+
             items.RemoveAt(activeItemIndex);
             if (activeItemIndex > 0)
             {
@@ -112,7 +115,6 @@ public class Items: MonoBehaviour
                 activeItemIndex = -1;
                 itemImageHolder.enabled = false;
             }
-
         }
     }
 }
